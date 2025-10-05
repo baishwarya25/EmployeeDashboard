@@ -1,0 +1,159 @@
+/* Container styling */
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(120deg, #f4f9ff, #e6f7ff);
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+/* Title styling */
+.title {
+  text-align: center;
+  color: #0077b6;
+  margin-bottom: 15px;
+}
+
+/* Employee form layout */
+.employee-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.employee-form input,
+.employee-form select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.employee-form input:focus,
+.employee-form select:focus {
+  border-color: #0077b6;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 119, 182, 0.5);
+}
+
+.employee-form label {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Submit button */
+.submit-btn {
+  grid-column: 1 / -1;
+  padding: 10px;
+  background: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.3s;
+}
+
+.submit-btn:hover {
+  background: #005f8a;
+}
+
+/* Search bar */
+.search-bar {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* Table wrapper for scroll */
+.table-wrapper {
+  max-height: 400px;
+  overflow: auto;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 5px;
+}
+
+/* Employee table styling */
+.employee-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.employee-table th,
+.employee-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+  min-width: 120px;
+}
+
+.employee-table th {
+  background: #0077b6;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Buttons in table */
+.edit-btn,
+.delete-btn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  margin: 2px;
+  font-size: 13px;
+}
+
+.edit-btn {
+  background: #00b894;
+}
+
+.delete-btn {
+  background: #d63031;
+}
+
+/* No data message */
+.no-data {
+  text-align: center;
+  color: gray;
+  font-style: italic;
+  margin: 10px 0;
+}
+
+/* Highlighted search text */
+.highlight {
+  background-color: #ffe066;
+  color: #000;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* Scrollbar styling */
+.table-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 119, 182, 0.5);
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}

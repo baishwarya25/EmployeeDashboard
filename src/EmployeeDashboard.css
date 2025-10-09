@@ -1,159 +1,180 @@
-/* Container styling */
-.container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: auto;
+body {
+  background-color: #e6f0fa; /* Light blue background */
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(120deg, #f4f9ff, #e6f7ff);
+  margin: 0;
+  padding: 0;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 25px;
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
-  overflow: hidden;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Title styling */
-.title {
+/* Title */
+h2 {
   text-align: center;
-  color: #0077b6;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
+  color: #3399ff; /* Light blue title */
+  font-size: 28px;
+  font-weight: 600;
 }
 
-/* Employee form layout */
+/* Form */
 .employee-form {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 25px;
 }
 
 .employee-form input,
 .employee-form select {
-  padding: 8px;
-  border: 1px solid #ccc;
+  padding: 10px 14px;
+  border: 1px solid #000; /* Black outline */
   border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f4f8fc; /* Very light blue background */
+  color: #1a3c6e; /* Text color */
   font-size: 14px;
   transition: border 0.3s, box-shadow 0.3s;
 }
 
 .employee-form input:focus,
 .employee-form select:focus {
-  border-color: #0077b6;
+  border-color: #000; /* Keep outline black on focus */
   outline: none;
-  box-shadow: 0 0 5px rgba(0, 119, 182, 0.5);
+  box-shadow: none;
 }
 
 .employee-form label {
-  font-weight: bold;
-  color: #333;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: #66ccff; /* Light blue labels */
 }
 
-/* Submit button */
+/* Submit button (Add/Update Employee) */
 .submit-btn {
-  grid-column: 1 / -1;
-  padding: 10px;
-  background: #0077b6;
-  color: white;
-  border: none;
-  border-radius: 8px;
+  grid-column: span 2;
+  padding: 12px 20px;
+  background-color: #66ccff; /* Light blue button */
+  color: #1a3c6e; /* Dark text for contrast */
+  border: 1px solid #3399ff;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 15px;
-  transition: background 0.3s;
+  font-weight: 600;
+  transition: 0.3s;
 }
 
 .submit-btn:hover {
-  background: #005f8a;
+  background-color: #3399ff; /* Darker blue on hover */
+  color: #fff;
 }
 
 /* Search bar */
 .search-bar {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
+  max-width: 400px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #000; /* Black border */
+  background-color: #f4f8fc;
+  color: #1a3c6e;
   font-size: 14px;
 }
 
-/* Table wrapper for scroll */
-.table-wrapper {
-  max-height: 400px;
-  overflow: auto;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background: #fff;
-  padding: 5px;
+.search-bar:focus {
+  border-color: #000; /* Black outline on focus */
+  outline: none;
+  box-shadow: none;
 }
 
-/* Employee table styling */
-.employee-table {
+/* Table wrapper */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Table */
+table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 1000px;
 }
 
-.employee-table th,
-.employee-table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
-  min-width: 120px;
+th, td {
+  padding: 12px 14px;
+  border: 1px solid #d1e3f0; /* Soft blue border */
+  text-align: left;
+  font-size: 14px;
+  color: #1a3c6e;
 }
 
-.employee-table th {
-  background: #0077b6;
-  color: white;
+th {
+  background-color: #cce6ff; /* Soft light blue header */
+  color: #1a3c6e; /* Dark text for readability */
   position: sticky;
   top: 0;
-  z-index: 1;
 }
 
-/* Buttons in table */
-.edit-btn,
-.delete-btn {
-  padding: 5px 10px;
+tr:nth-child(even) {
+  background-color: #f0f6fb; /* Very light blue row */
+}
+
+tr:hover {
+  background-color: #d6e6f8;
+}
+
+/* Buttons */
+.edit-btn, .delete-btn {
+  padding: 6px 12px;
+  margin: 2px;
   border: none;
   border-radius: 5px;
   color: white;
   cursor: pointer;
   margin: 2px;
   font-size: 13px;
+  transition: 0.3s;
 }
 
 .edit-btn {
-  background: #00b894;
+  background-color: #66ccff;
+  color: #1a3c6e;
+}
+
+.edit-btn:hover {
+  background-color: #3399ff;
+  color: #fff;
 }
 
 .delete-btn {
-  background: #d63031;
+  background-color: #ff6666;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background-color: #cc3333;
 }
 
 /* No data message */
 .no-data {
   text-align: center;
-  color: gray;
-  font-style: italic;
-  margin: 10px 0;
+  padding: 20px;
+  color: #555;
+  font-weight: 500;
 }
 
-/* Highlighted search text */
+/* Highlight search text */
 .highlight {
-  background-color: #ffe066;
-  color: #000;
-  font-weight: 600;
-  padding: 2px 4px;
-  border-radius: 3px;
-}
-
-/* Scrollbar styling */
-.table-wrapper::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.table-wrapper::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 119, 182, 0.5);
-  border-radius: 4px;
-}
-
-.table-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background-color: #fff176; /* Yellow highlight */
+  font-weight: bold;
 }

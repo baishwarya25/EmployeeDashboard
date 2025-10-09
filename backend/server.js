@@ -148,3 +148,30 @@ app.delete("/api/employees/:id", async (req, res) => {
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+
+
+
+/*SELECT 
+    ID,
+    EMP_ID,
+    TYPE,
+    ID_NO,
+    TITLE,
+    NAME,
+    DESIGNATION,
+    DIRECTORY,
+    DIVISION,
+    TO_CHAR(DATE_OF_JOIN, 'DD-MON-YYYY') AS DATE_OF_JOIN,
+    TO_CHAR(DATE_OF_POST, 'DD-MON-YYYY') AS DATE_OF_POST,
+    QUALIFICATION,
+    DISCIPLINE,
+    SEX,
+    BLOOD_GROUP,
+    PHONE,
+    ADDRESS,
+    PERMANENT_ADDRESS,
+    TO_CHAR(DOB, 'DD-MON-YYYY') AS DOB
+FROM EMPLOYEES
+ORDER BY ID;*/

@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+
+/* --- Refactored Components using @apply --- */
+
+/* Main Container: max-w: 1250px, margin: 40px auto, padding: 35px, background: #ffffff, border-radius: 20px, box-shadow: 0 20px 40px rgba(0,0,0,0.1); */
+.container {
+    @apply max-w-[1250px] mx-auto my-10 p-[35px] bg-white rounded-2xl shadow-2xl shadow-black/10;
+}
+
+/* Dashboard Title: text-align: center, font-size: 34px, color: #5b21b6 */
+.dashboard-title {
+    @apply text-center text-[34px] font-bold text-deep-purple mb-10 tracking-wide;
+}
+
+/* Form Card: display: grid; gap: 25px; etc. */
+.employee-form {
+    @apply grid gap-[25px] p-[25px] bg-gray-100 rounded-2xl shadow-xl shadow-deep-purple/15 mb-10 transition-all duration-300;
+    /* Custom CSS for grid-template-columns */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* Form Section: Soft purple background */
+.form-section {
+    @apply col-span-full mb-5 p-4 rounded-xl bg-violet-100 font-semibold text-base text-deep-purple shadow-inner shadow-deep-purple/5;
+}
+
+/* Inputs & Selects: Complex hover/focus states */
+.form-input-field {
+    @apply p-3.5 rounded-xl border border-violet-300 bg-white text-sm transition-all duration-300;
+}
+.form-input-field:focus {
+    @apply outline-none border-violet-500 shadow-xl shadow-violet-500/30;
+}
+
+/* Submit Button: Gradient and hover effect */
+.submit-btn {
+    @apply col-span-2 py-3.5 text-base font-bold rounded-[15px] border-none text-white cursor-pointer transition-all duration-300;
+    /* Using custom CSS for the gradient */
+    background: linear-gradient(90deg, #7c3aed, #c084fc);
+}
+.submit-btn:hover {
+    @apply -translate-y-[3px] shadow-xl shadow-violet-500/40;
+}
+
+/* Table Header */
+.table-header {
+    @apply bg-violet-200 text-deep-purple font-semibold capitalize sticky top-0;
+}
+
+/* Table Row Hover */
+.table-row-hover:hover {
+    @apply bg-violet-200;
+}
+
+/* Action Buttons */
+.action-btn-edit {
+    @apply py-[7px] px-4 m-[2px] rounded-xl font-semibold text-sm cursor-pointer transition-all duration-300 border-none bg-violet-400 text-white hover:bg-violet-600;
+}
+.action-btn-delete {
+    @apply py-[7px] px-4 m-[2px] rounded-xl font-semibold text-sm cursor-pointer transition-all duration-300 border-none bg-red-400 text-white hover:bg-red-700;
+}
+
+/* --- End Refactored Components --- */
+
+@tailwind utilities;

@@ -1,10 +1,11 @@
-// src/App.js
-import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
-import { Trash2, X, Search, Edit, UserPlus, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Trash2, X, Search, Edit, UserPlus, Save } from 'lucide-react'; 
 
 // --- MOCK DATA FOR DEMONSTRATION (unchanged) ---
-const initialEmployees = [];
+const initialEmployees = [
+  { id: 'E1001', empId: 'E1001', type: 'Staff', idNo: '12345', title: 'Mr.', name: 'Alice Johnson', designation: 'Software Engineer', directory: 'DIT', division: 'Development', dateOfJoin: '2020-05-15', dateOfPost: '2022-01-01', qualification: 'B.Tech', discipline: 'Computer Science', sex: 'Male', bloodGroup: 'A+', phone: '9876543210', address: '123 Tech Lane', permanentAddress: '123 Tech Lane', dob: '1995-10-20' },
+  { id: 'E1002', empId: 'E1002', type: 'Contract', idNo: '67890', title: 'Ms.', name: 'Bob Smith', designation: 'Director', directory: 'DOI', division: 'Networking', dateOfJoin: '2018-08-20', dateOfPost: '2023-03-10', qualification: 'M.Sc', discipline: 'Statistics', sex: 'Female', bloodGroup: 'O-', phone: '9988776655', address: '456 Data Street', permanentAddress: '456 Data Street', dob: '1990-04-05' },
+];
 
 // --- Custom Alert/Modal Component (unchanged) ---
 const AppAlert = ({ message, type, onConfirm, onCancel }) => {
@@ -55,22 +56,20 @@ const AppAlert = ({ message, type, onConfirm, onCancel }) => {
 };
 
 // --- Main Employee Dashboard Component ---
-const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState }) => {
+const EmployeeDashboard = ({
+  employees, setEmployees, alertState, setAlertState
+}) => {
+  // Re-added state for the form
   const emptyForm = {
     empId: "", type: "", idNo: "", title: "", name: "", designation: "",
     directory: "", division: "", dateOfJoin: "", dateOfPost: "",
     qualification: "", discipline: "", sex: "", bloodGroup: "", phone: "",
     address: "", permanentAddress: "", dob: ""
   };
-
+  
   const [form, setForm] = useState(emptyForm);
-  const [editId, setEditId] = useState(null); // will hold empId when editing
+  const [editId, setEditId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-
-  // -------------------------
-  // IMPORTANT: use BASE_URL (no "/add" here)
-  // -------------------------
-  const BASE_URL = "http://localhost:8080/api/employees";
 
   const showAlert = (message, type = 'success', onConfirm = null, onCancel = null) => {
     setAlertState({ message, type, onConfirm, onCancel });
@@ -79,7 +78,7 @@ const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState 
   const closeAlert = () => {
     setAlertState({ message: null, type: null, onConfirm: null, onCancel: null });
   };
-
+  
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const validateForm = () => {
@@ -90,117 +89,58 @@ const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState 
     return true;
   };
 
-  // ------- fetch function (used on load and after operations) -------
-  const fetchEmployees = useCallback(async () => {
-    try {
-      // GET /api/employees (your controller's @GetMapping)
-      const res = await axios.get(BASE_URL);
-      // res.data should be an array of Employee objects with empId, name, etc.
-      setEmployees(res.data || []);
-    } catch (err) {
-      console.error("Error fetching employees:", err);
-      showAlert("Failed to fetch employee data from backend.", "error");
-    }
-  }, [setEmployees]); // stable
-
-  // load once
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (alertState.message) return;
     if (!validateForm()) return;
-
-    try {
-      if (editId) {
-        // PUT /api/employees/{empId}
-        await axios.put(`${BASE_URL}/${editId}`, form);
-        showAlert("Employee updated successfully!");
-        // refresh list from backend to keep in sync
-        await fetchEmployees();
-      } else {
-        // POST /api/employees/add
-        await axios.post(`${BASE_URL}/add`, form);
-        showAlert("Employee added successfully!");
-        // refresh list (because your controller currently returns a message map, not the created entity)
-        await fetchEmployees();
-      }
-
-      setForm(emptyForm);
-      setEditId(null);
-    } catch (error) {
-      console.error("Error saving employee:", error);
-      // if backend returns validation error, log details
-      if (error.response) console.error("Backend response:", error.response.data);
-      showAlert("Failed to save employee. Please check the backend connection and form data.", "error");
+    
+    // Simulate API save
+    if (editId) {
+      setEmployees(employees.map(emp => emp.id === editId ? { ...form, id: editId } : emp));
+      showAlert("Employee updated successfully!");
+    } else {
+      const newId = `E${Math.floor(Math.random() * 10000) + 2000}`;
+      // Ensure empId is set in the data if the form field was edited
+      setEmployees([...employees, { ...form, id: newId, empId: form.empId || newId }]);
+      showAlert("Employee added successfully!");
     }
+
+    setForm(emptyForm);
+    setEditId(null);
   };
 
-  const handleEdit = (empId) => {
-    // Find employee by empId (backend uses empId)
-    const emp = employees.find(e => e.empId === empId);
-    if (!emp) return showAlert("Employee not found in local list.", "error");
-    // set form fields using the object from backend (property names must match your form keys)
-    // If backend returns date fields differently, adapt accordingly (we assume same names).
-    setForm({
-      empId: emp.empId || "",
-      type: emp.type || "",
-      idNo: emp.idNo || "",
-      title: emp.title || "",
-      name: emp.name || "",
-      designation: emp.designation || "",
-      directory: emp.directory || "",
-      division: emp.division || "",
-      dateOfJoin: emp.dateOfJoin || "",
-      dateOfPost: emp.dateOfPost || "",
-      qualification: emp.qualification || "",
-      discipline: emp.discipline || "",
-      sex: emp.sex || "",
-      bloodGroup: emp.bloodGroup || "",
-      phone: emp.phone || "",
-      address: emp.address || "",
-      permanentAddress: emp.permanentAddress || "",
-      dob: emp.dob || ""
-    });
-    setEditId(empId); // important: use empId as identifier
+  const handleEdit = (id) => {
+    const emp = employees.find(e => e.id === id);
+    setForm(emp);
+    setEditId(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  const handleDelete = (empId) => {
+  
+  const handleDelete = (id) => {
     showAlert(
       "Are you sure you want to delete this employee record? This action cannot be undone.",
       'confirm',
-      async () => {
-        try {
-          // DELETE /api/employees/{empId}
-          await axios.delete(`${BASE_URL}/${empId}`);
-          showAlert("Employee deleted.");
-          // refresh list
-          await fetchEmployees();
-          // if we were editing the deleted record, reset form
-          if (editId === empId) {
+      () => {
+        setEmployees(employees.filter(emp => emp.id !== id));
+        // If the deleted employee was the one being edited, reset the form
+        if (editId === id) {
             setForm(emptyForm);
             setEditId(null);
-          }
-        } catch (error) {
-          console.error("Error deleting employee:", error);
-          if (error.response) console.error("Backend response:", error.response.data);
-          showAlert("Failed to delete employee.", "error");
         }
+        showAlert("Employee deleted.");
       },
       closeAlert
     );
   };
 
-  const filteredEmployees = employees.filter(emp => 
-    (emp.name || "").toLowerCase().includes((searchTerm || "").toLowerCase()) ||
-    (emp.empId || "").toLowerCase().includes((searchTerm || "").toLowerCase()) ||
-    (emp.designation || "").toLowerCase().includes((searchTerm || "").toLowerCase()) ||
-    (emp.division || "").toLowerCase().includes((searchTerm || "").toLowerCase())
+  const filteredEmployees = employees.filter(emp =>
+    emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.empId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.division.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Fields array remains the same for table mapping
   const fields = [
     { key: "empId", label: "Employee ID", type: "text", required: true },
     { key: "type", label: "Type", type: "select", options: ["Staff", "Contract"], required: true },
@@ -224,12 +164,18 @@ const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState 
 
   return (
     <div className="max-w-8xl mx-auto my-8 p-6 lg:p-10 bg-white rounded-3xl shadow-2xl shadow-indigo-100/50">
-      <h1 className="text-4xl font-extrabold text-indigo-700 text-center mb-12">Employee Dashboard</h1>
+      
+      {/* Overall Application Heading - COLOR CHANGED TO INDIGO-700 */}
+      <h1 className="text-4xl font-extrabold text-indigo-700 text-center mb-12">
+        Employee Dashboard
+      </h1>
 
+      {/* Employee Form Card - HEADING INSIDE FORM REMOVED */}
       <form
         className="mb-12 bg-gray-50 p-6 rounded-2xl border border-indigo-100 shadow-xl shadow-indigo-200/50"
         onSubmit={handleSubmit}
       >
+        {/* Form Fields Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {fields.map(field => (
             <div key={field.key} className="flex flex-col">
@@ -240,7 +186,7 @@ const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState 
                 <select
                   id={field.key}
                   name={field.key}
-                  value={form[field.key] || ""}
+                  value={form[field.key]}
                   onChange={handleChange}
                   required={field.required}
                   className="p-3 rounded-lg border border-gray-300 bg-white text-sm transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none shadow-inner"
@@ -253,7 +199,7 @@ const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState 
                   id={field.key}
                   type={field.type}
                   name={field.key}
-                  value={form[field.key] || ""}
+                  value={form[field.key]}
                   onChange={handleChange}
                   required={field.required}
                   placeholder={`Enter ${field.label}`}
@@ -265,40 +211,44 @@ const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState 
           ))}
         </div>
         
+        {/* Submit Button - Retained professional styling and shading */}
         <div className="mt-8 pt-6 border-t border-indigo-200 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-          <button
-            type="submit"
-            className="w-full sm:w-1/3 flex items-center justify-center py-3 text-lg font-semibold rounded-xl text-white cursor-pointer transition-all duration-300 
-                       bg-gradient-to-r from-indigo-700 to-purple-700 hover:from-indigo-800 hover:to-purple-800 
-                       shadow-xl shadow-indigo-400/50 transform hover:scale-[1.01] hover:-translate-y-0.5"
-          >
-            {editId ? <><Save size={20} className='mr-2' /> Update Record</> : <><UserPlus size={20} className='mr-2' /> Save Record</>}
-          </button>
-          {editId && (
             <button
-              type="button"
-              onClick={() => { setForm(emptyForm); setEditId(null); }}
-              className="w-full sm:w-1/3 flex items-center justify-center py-3 text-lg font-semibold rounded-xl text-gray-700 bg-gray-200 hover:bg-gray-300 transition-all duration-300 shadow-md transform hover:scale-[1.01] hover:-translate-y-0.5"
+                type="submit"
+                className="w-full sm:w-1/3 flex items-center justify-center py-3 text-lg font-semibold rounded-xl text-white cursor-pointer transition-all duration-300 
+                           bg-gradient-to-r from-indigo-700 to-purple-700 hover:from-indigo-800 hover:to-purple-800 
+                           shadow-xl shadow-indigo-400/50 transform hover:scale-[1.01] hover:-translate-y-0.5"
             >
-              <X size={20} className='mr-2' /> Cancel Edit
+                {editId ? <><Save size={20} className='mr-2' /> Update Record</> : <><UserPlus size={20} className='mr-2' /> Save Record</>}
             </button>
-          )}
+            {editId && (
+              <button
+                type="button"
+                onClick={() => { setForm(emptyForm); setEditId(null); }}
+                className="w-full sm:w-1/3 flex items-center justify-center py-3 text-lg font-semibold rounded-xl text-gray-700 bg-gray-200 hover:bg-gray-300 transition-all duration-300 shadow-md transform hover:scale-[1.01] hover:-translate-y-0.5"
+              >
+                <X size={20} className='mr-2' /> Cancel Edit
+              </button>
+            )}
         </div>
       </form>
 
+      {/* Search Bar Area - Retained clean styling and shadow */}
       <div className="flex justify-center mb-10">
         <div className="relative w-full max-w-xl">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            type="text"
-            className="w-full p-4 pl-12 rounded-xl border border-gray-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 shadow-lg transition-shadow"
-            placeholder="Search by Name, ID, Designation, or Division..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+                type="text"
+                className="w-full p-4 pl-12 rounded-xl border border-gray-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 shadow-lg transition-shadow"
+                placeholder="Search by Name, ID, Designation, or Division..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+            />
         </div>
       </div>
 
+
+      {/* Employee Table - Retained Indigo Header and Border */}
       <h3 className="text-3xl font-bold text-indigo-700 mb-6 border-l-4 border-indigo-500 pl-4 py-1">
         Employee List ({filteredEmployees.length} Found)
       </h3>
@@ -312,13 +262,15 @@ const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState 
                   {field.label}
                 </th>
               ))}
-              <th className="p-4 text-sm font-bold uppercase tracking-wider w-40 text-center">Actions</th>
+              <th className="p-4 text-sm font-bold uppercase tracking-wider w-40 text-center"> 
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {filteredEmployees.length ? filteredEmployees.map((emp, index) => (
               <tr 
-                key={emp.empId} 
+                key={emp.id} 
                 className={`text-sm ${index % 2 === 0 ? 'bg-white' : 'bg-indigo-50'} hover:bg-indigo-200 transition-colors duration-200 cursor-pointer`}
               >
                 {fields.map(field => (
@@ -327,33 +279,34 @@ const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState 
                   </td>
                 ))}
                 <td className="p-3.5 text-center whitespace-nowrap">
+                  {/* Edit button - Retained hover/shadow effects */}
                   <button
                     className="py-2 px-3 m-1 rounded-lg font-medium text-xs transition-all duration-300 bg-indigo-500 text-white hover:bg-indigo-600 shadow-md transform hover:-translate-y-0.5"
-                    onClick={() => handleEdit(emp.empId)}
+                    onClick={() => handleEdit(emp.id)}
                     aria-label={`Edit ${emp.name}`}
                   >
                     <Edit size={14} />
                   </button>
+                  {/* Delete button - Retained hover/shadow effects */}
                   <button
                     className="py-2 px-3 m-1 rounded-lg font-medium text-xs transition-all duration-300 bg-red-500 text-white hover:bg-red-600 shadow-md transform hover:-translate-y-0.5"
-                    onClick={() => handleDelete(emp.empId)}
+                    onClick={() => handleDelete(emp.id)}
                     aria-label={`Delete ${emp.name}`}
                   >
                     <Trash2 size={14} />
                   </button>
                 </td>
               </tr>
-            )) : (
-              <tr>
-                <td colSpan={fields.length + 1} className="text-center p-8 text-indigo-600 font-semibold bg-white">
-                  No employees found matching the search criteria. Try a different query.
-                </td>
-              </tr>
-            )}
+            )) : <tr>
+              <td colSpan={fields.length + 1} className="text-center p-8 text-indigo-600 font-semibold bg-white">
+                No employees found matching the search criteria. Try a different query.
+              </td>
+            </tr>}
           </tbody>
         </table>
       </div>
 
+      {/* Render Alert/Confirmation Modal */}
       <AppAlert 
         message={alertState.message} 
         type={alertState.type}
@@ -364,12 +317,13 @@ const EmployeeDashboard = ({ employees, setEmployees, alertState, setAlertState 
   );
 };
 
-// --- App Wrapper ---
+// --- App Wrapper to hold Global State and Styles ---
 const App = () => {
   const [employees, setEmployees] = useState(initialEmployees);
   const [alertState, setAlertState] = useState({ message: null, type: null, onConfirm: null, onCancel: null });
 
   return (
+    // Global body styles applied here
     <div className="min-h-screen bg-gray-100 font-sans text-gray-700 pb-16">
       <EmployeeDashboard 
         employees={employees} 

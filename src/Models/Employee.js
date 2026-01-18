@@ -14,19 +14,18 @@ const AppAlert = ({ message, type, onConfirm, onCancel }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full">
         <h3
-          className={`text-xl font-bold mb-4 ${
-            type === "error"
+          className={`text-xl font-bold mb-4 ${type === "error"
               ? "text-red-600"
               : type === "confirm"
-              ? "text-amber-600"
-              : "text-indigo-600"
-          }`}
+                ? "text-amber-600"
+                : "text-indigo-600"
+            }`}
         >
           {type === "confirm"
             ? "Confirm Action"
             : type === "error"
-            ? "Error"
-            : "Success"}
+              ? "Error"
+              : "Success"}
         </h3>
         <p className="mb-6">{message}</p>
         <div className="flex justify-end gap-4">
@@ -37,13 +36,12 @@ const AppAlert = ({ message, type, onConfirm, onCancel }) => {
           )}
           <button
             onClick={type === "confirm" ? onConfirm : onCancel}
-            className={`px-4 py-2 text-white rounded-lg ${
-              type === "error"
+            className={`px-4 py-2 text-white rounded-lg ${type === "error"
                 ? "bg-red-600"
                 : type === "confirm"
-                ? "bg-amber-500"
-                : "bg-indigo-600"
-            }`}
+                  ? "bg-amber-500"
+                  : "bg-indigo-600"
+              }`}
           >
             {type === "confirm" ? "Proceed" : "OK"}
           </button>
@@ -89,22 +87,31 @@ const Employee = () => {
   const [directories, setDirectories] = useState([]);
   const [divisions, setDivisions] = useState([]);
 
+  const [selectedRow, setSelectedRow] = useState(null); // NEW FOR ROW HIGHLIGHT
+
   const showAlert = (msg, type = "success", onConfirm = null, onCancel = null) => {
     setAlertState({ message: msg, type, onConfirm, onCancel });
   };
 
   const closeAlert = () => setAlertState({ message: null, type: null });
 
-  // 👉 Dynamic dropdown handler
+  // 👉 Dynamic dropdown
   const handleChange = async (e) => {
     let { name, value } = e.target;
 
     if (["empId", "idNo", "phone"].includes(name)) {
       value = value.replace(/\D/g, "");
     }
+
     if (name === "empId" && value.length > 8) return;
     if (name === "idNo" && value.length > 4) return;
     if (name === "phone" && value.length > 10) return;
+
+    // allow symbols in address fields
+    if (name === "address" || name === "permanentAddress") {
+      setForm((prev) => ({ ...prev, [name]: value }));
+      return;
+    }
 
     setForm((prev) => ({ ...prev, [name]: value }));
 
@@ -131,7 +138,14 @@ const Employee = () => {
       return showAlert("ID Number must be exactly 4 digits", "error");
     if (!/^[0-9]{10}$/.test(form.phone))
       return showAlert("Phone must be 10 digits", "error");
-    if (!form.name) return showAlert("Full Name is required", "error");
+
+    // NAME LENGTH MINIMUM 30
+    if (!form.name)
+  return showAlert("Full Name is required", "error");
+
+if (form.name.length > 30)
+  return showAlert("Full Name must be at least 30 characters", "error");
+
     return true;
   };
 
@@ -144,7 +158,6 @@ const Employee = () => {
     }
   }, []);
 
-  // 👉 Load directories from backend
   const fetchDirectories = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/directories`);
@@ -229,7 +242,10 @@ const Employee = () => {
       e.empId?.includes(searchTerm)
   );
 
-  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const paginated = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const fields = [
     { key: "empId", label: "Employee ID", required: true },
@@ -238,8 +254,6 @@ const Employee = () => {
     { key: "title", label: "Title", type: "select", required: true, options: ["Mr.", "Ms.", "Mrs.", "Dr."] },
     { key: "name", label: "Full Name", required: true },
     { key: "designation", label: "Designation", type: "select", required: true, options: ["Software Engineer", "Director", "Group Director", "Intern"] },
-
-    //  🔥 Updated Dynamic Dropdowns Here
     {
       key: "directory",
       label: "Directory",
@@ -254,7 +268,6 @@ const Employee = () => {
       required: true,
       options: divisions,
     },
-
     { key: "dateOfJoin", label: "Date of Joining", type: "date", required: true },
     { key: "dateOfPost", label: "Date of Present Post", type: "date" },
     { key: "qualification", label: "Qualification" },
@@ -268,7 +281,7 @@ const Employee = () => {
   ];
 
   return (
-    <div className="max-w-8xl mx-auto my-8 p-6 lg:p-10 bg-white rounded-3xl shadow-2xl shadow-indigo-100/50">
+    <div className="max-w-8xl mx-auto my-8 p-6 lg?p-10 bg-white rounded-3xl shadow-2xl shadow-indigo-100/50">
       <h1 className="text-4xl font-extrabold text-indigo-700 text-center mb-12">
         Employee Registration
       </h1>
@@ -286,8 +299,12 @@ const Employee = () => {
                   name={field.key}
                   value={form[field.key]}
                   onChange={handleChange}
+                  onBlur={() => setTouched((prev) => ({ ...prev, [field.key]: true }))}
                   disabled={field.key === "division" && !form.directory}
-                  className="p-3 rounded-lg border border-gray-300"
+                  className={`p-3 rounded-lg border ${touched[field.key] && !form[field.key]
+                      ? "border-red-600"
+                      : "border-gray-300"
+                    }`}
                   required={field.required}
                 >
                   <option value="">-- Select {field.label} --</option>
@@ -297,20 +314,25 @@ const Employee = () => {
                 </select>
               ) : (
                 <input
-                  name={field.key}
-                  type={field.type || "text"}
-                  value={form[field.key]}
-                  onChange={handleChange}
-                  min={field.key === "dateOfPost" ? form.dateOfJoin : ""}
-                  disabled={editId && field.key === "empId"}
-                  className="p-3 rounded-lg border border-gray-300"
-                  required={field.required}
-                />
+  name={field.key}
+  type={field.type || "text"}
+  value={form[field.key]}
+  onChange={handleChange}
+  onBlur={() => setTouched((prev) => ({ ...prev, [field.key]: true }))}
+  min={field.key === "dateOfPost" ? form.dateOfJoin : ""}
+  max={field.key === "dob" ? new Date().toISOString().split("T")[0] : ""}
+  disabled={editId && field.key === "empId"}
+  className={`p-3 rounded-lg border ${
+    touched[field.key] && !form[field.key]
+      ? "border-red-600"
+      : "border-gray-300"
+  }`}
+  required={field.required}
+/>
+
               )}
 
-              {field.required && touched[field.key] && !form[field.key] && (
-                <span className="text-red-500 text-xs mt-1">* This field is required</span>
-              )}
+              {/* REQUIRED TEXT REMOVED */}
             </div>
           ))}
         </div>
@@ -319,18 +341,18 @@ const Employee = () => {
           <button type="submit" className="bg-indigo-600 text-white px-6 py-3 rounded-xl flex items-center">
             {editId ? (
               <>
-                <Save size={20} className="mr-2"/> Update Record
+                <Save size={20} className="mr-2" /> Update Record
               </>
             ) : (
               <>
-                <UserPlus size={20} className="mr-2"/> Save Record
+                <UserPlus size={20} className="mr-2" /> Save Record
               </>
             )}
           </button>
 
           {editId && (
             <button type="button" onClick={() => { setForm(emptyForm); setEditId(null); setTouched({}); }} className="bg-gray-300 px-6 py-3 rounded-xl">
-              <X className="inline-block mr-2" size={18}/> Cancel Edit
+              <X className="inline-block mr-2" size={18} /> Cancel Edit
             </button>
           )}
 
@@ -342,7 +364,7 @@ const Employee = () => {
 
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
         <div className="relative w-full max-w-xl">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
             placeholder="Search by name or ID..."
@@ -376,16 +398,32 @@ const Employee = () => {
           <tbody>
             {paginated.length ? (
               paginated.map((emp) => (
-                <tr key={emp.empId} className="hover:bg-indigo-100 transition">
+                <tr
+                  key={emp.empId}
+                  onClick={() => setSelectedRow(emp.empId)}
+                  className={`cursor-pointer transition ${selectedRow === emp.empId ? "bg-blue-200" : "hover:bg-indigo-100"
+                    }`}
+                >
                   {fields.map((f) => (
-                    <td key={f.key} className="p-3 border">{emp[f.key]}</td>
+                    <td
+  key={f.key}
+  onClick={() => setSelectedRow(emp.empId)}
+  className={`p-3 border cursor-pointer ${
+    selectedRow === emp.empId ? "bg-blue-200" : ""
+  }`}
+>
+  {f.type === "date" && emp[f.key]
+    ? emp[f.key].split("-").reverse().join("-")
+    : emp[f.key]}
+</td>
+
                   ))}
                   <td className="p-3 text-center">
                     <button onClick={() => handleEdit(emp.empId)} className="bg-blue-500 text-white px-3 py-1 rounded-md mr-2">
-                      <Edit size={14}/>
+                      <Edit size={14} />
                     </button>
                     <button onClick={() => handleDelete(emp.empId)} className="bg-red-500 text-white px-3 py-1 rounded-md">
-                      <Trash2 size={14}/>
+                      <Trash2 size={14} />
                     </button>
                   </td>
                 </tr>
@@ -413,7 +451,7 @@ const Employee = () => {
         </button>
       </div>
 
-      <AppAlert {...alertState} onCancel={closeAlert}/>
+      <AppAlert {...alertState} onCancel={closeAlert} />
     </div>
   );
 };
